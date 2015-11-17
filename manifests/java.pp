@@ -39,6 +39,10 @@ class logstash::java {
             $package = 'openjdk-7-jre-headless'
           }
         }
+        if $logstash::manage_repo {
+          include ::apt
+          Class['apt::update'] -> Package<| tag == 'java-package' |>
+        }
       }
       'OpenSuSE': {
         $package = 'java-1_6_0-openjdk'
@@ -58,7 +62,8 @@ class logstash::java {
   ## Install the java package unless already specified somewhere else
   if !defined(Package[$package]) {
     package { $package:
-      ensure => present
+      ensure => present,
+      tag    => ['java-package'],
     }
   }
 }
